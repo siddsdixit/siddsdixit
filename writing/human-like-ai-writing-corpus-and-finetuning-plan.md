@@ -2,6 +2,11 @@
 
 *Sep 19, 2026 · [@Sid](https://github.com/siddsdixit)*
 
+> The build plan below is implemented as a runnable pipeline in
+> [`pipelines/human-like-writing/`](../pipelines/human-like-writing/) —
+> fetch, neutralize, pair, prep-finetune, and evaluate stages, each mapped
+> to a numbered step here.
+
 ## Why prompting alone doesn't work
 
 A 2025 research paper, ["Catch Me If You Can? Not Yet"](https://arxiv.org/abs/2509.14543), tested whether LLMs can imitate an individual author's implicit writing style using few-shot prompting — feeding the model a handful of the author's own samples. It used forensic linguistics techniques including authorship attribution, authorship verification, and stylometric distance analysis to check the results rigorously. The finding: LLMs still struggle to imitate the implicit writing styles of everyday authors. Few-shot prompting is a known weak point across the field, not a failure specific to any one approach.

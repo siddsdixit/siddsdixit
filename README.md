@@ -65,7 +65,7 @@ Finds your plan's holes before you commit time or money. Severity-ranked finding
 
 ## Writing
 
-- [Human-Like AI Writing: Corpus and Fine-Tuning Plan](writing/human-like-ai-writing-corpus-and-finetuning-plan.md) — Sep 19, 2026
+- [Human-Like AI Writing: Corpus and Fine-Tuning Plan](writing/human-like-ai-writing-corpus-and-finetuning-plan.md) — Sep 19, 2026 · [pipeline code](pipelines/human-like-writing/)
 
 ---
 
