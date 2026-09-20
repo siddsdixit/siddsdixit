@@ -63,6 +63,12 @@ Finds your plan's holes before you commit time or money. Severity-ranked finding
 
 ---
 
+## Writing
+
+- [Human-Like AI Writing: Corpus and Fine-Tuning Plan](writing/human-like-ai-writing-corpus-and-finetuning-plan.md) — Sep 19, 2026
+
+---
+
 ## What I do
 
 I take large engineering orgs and inject startup velocity. I ship things stuck for years. I build AI-first product strategies that drive real revenue. I translate between business outcomes and technical execution.
