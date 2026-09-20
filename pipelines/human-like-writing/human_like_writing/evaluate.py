@@ -14,14 +14,26 @@ from statistics import mean, pstdev
 from .stylometry import FEATURE_NAMES, extract_features
 
 
-def _load_texts(path: Path, field: str):
+def _load_texts(path: Path, field: str, truncate_words: int = 0):
+    """Load one text per JSONL line, optionally truncated to the first N words.
+
+    Several features (type_token_ratio, hapax_ratio especially) are
+    length-sensitive: a short snippet naturally has a higher ratio of
+    unique words than a full-length document, independent of style. Without
+    length-matching, comparing short generated samples to full-length
+    reference documents manufactures an apparent style gap that is really
+    just a length gap.
+    """
     texts = []
     with path.open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
-            texts.append(json.loads(line)[field])
+            text = json.loads(line)[field]
+            if truncate_words:
+                text = " ".join(text.split()[:truncate_words])
+            texts.append(text)
     return texts
 
 
@@ -69,9 +81,13 @@ def main(argv=None):
     parser.add_argument("--generated", type=Path, required=True, help="JSONL of model-generated samples to check")
     parser.add_argument("--generated-field", default="text")
     parser.add_argument("--within", type=float, default=1.0, help="Std-dev band counted as 'overlapping' human range")
+    parser.add_argument("--truncate-words", type=int, default=0,
+                         help="Truncate both human and generated texts to their first N words before "
+                              "scoring, to avoid length-sensitive features (type_token_ratio, "
+                              "hapax_ratio) manufacturing a gap that's really just a length mismatch")
     args = parser.parse_args(argv)
 
-    human_texts = _load_texts(args.human, args.human_field)
+    human_texts = _load_texts(args.human, args.human_field, args.truncate_words)
     if len(human_texts) < 2:
         parser.error("Need at least 2 human reference samples to estimate a distribution")
     stats = reference_stats(human_texts)
@@ -81,7 +97,7 @@ def main(argv=None):
     if skipped:
         print(f"(skipping non-informative features with ~zero human variance: {', '.join(skipped)})\n")
 
-    generated_texts = _load_texts(args.generated, args.generated_field)
+    generated_texts = _load_texts(args.generated, args.generated_field, args.truncate_words)
     header = f"{'sample':>8}  " + "  ".join(f"{n:>20}" for n in FEATURE_NAMES)
     print(header)
     overlap_counts = []

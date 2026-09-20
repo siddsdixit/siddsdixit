@@ -1,6 +1,6 @@
 import json
 
-from human_like_writing.evaluate import reference_stats, z_scores
+from human_like_writing.evaluate import _load_texts, reference_stats, z_scores
 
 
 HUMAN_SAMPLES = [
@@ -48,6 +48,17 @@ def test_ai_like_sample_scores_further_from_human_mean():
     assert ai_z["avg_word_len"] is not None
     assert human_z["avg_word_len"] is not None
     assert abs(ai_z["avg_word_len"] - human_z["avg_word_len"]) > 0
+
+
+def test_truncate_words_shortens_loaded_text(tmp_path):
+    path = tmp_path / "docs.jsonl"
+    path.write_text(json.dumps({"text": "one two three four five six seven"}) + "\n", encoding="utf-8")
+
+    full = _load_texts(path, "text")
+    truncated = _load_texts(path, "text", truncate_words=3)
+
+    assert full == ["one two three four five six seven"]
+    assert truncated == ["one two three"]
 
 
 def test_cli_end_to_end(tmp_path, capsys):
