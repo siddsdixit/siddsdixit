@@ -25,18 +25,29 @@ def test_reference_stats_covers_all_features():
     assert stats["em_dash_rate"]["mean"] == 0
 
 
+def test_zero_variance_reference_feature_is_marked_non_informative():
+    # None of the 3 human samples use em-dashes, exclamations, or semicolons,
+    # so those features carry no discriminating signal and must not be
+    # scored as if a generated sample "matched" the human range by luck.
+    stats = reference_stats(HUMAN_SAMPLES)
+    assert stats["em_dash_rate"]["informative"] is False
+    assert stats["exclamation_rate"]["informative"] is False
+
+    z = z_scores(AI_LIKE_SAMPLE, stats)
+    assert z["em_dash_rate"] is None
+    assert z["exclamation_rate"] is None
+
+
 def test_ai_like_sample_scores_further_from_human_mean():
     stats = reference_stats(HUMAN_SAMPLES)
     ai_z = z_scores(AI_LIKE_SAMPLE, stats)
     human_z = z_scores(HUMAN_LIKE_SAMPLE, stats)
 
-    ai_em_dash_z = abs(ai_z["em_dash_rate"])
-    human_em_dash_z = abs(human_z["em_dash_rate"])
-    assert ai_em_dash_z > human_em_dash_z
-
-    ai_exclaim_z = abs(ai_z["exclamation_rate"])
-    human_exclaim_z = abs(human_z["exclamation_rate"])
-    assert ai_exclaim_z > human_exclaim_z
+    # avg_word_len has real variance in the reference sample (unlike the
+    # punctuation features above), so it's a meaningful comparison.
+    assert ai_z["avg_word_len"] is not None
+    assert human_z["avg_word_len"] is not None
+    assert abs(ai_z["avg_word_len"] - human_z["avg_word_len"]) > 0
 
 
 def test_cli_end_to_end(tmp_path, capsys):
